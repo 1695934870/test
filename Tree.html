@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>测试 ECharts</title>
+  <!-- 引入 echarts.js -->
+  <script src="https://cdn.staticfile.org/echarts/5.1.0/echarts.min.js"></script>
+  <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+  <style>
+    *{padding: 0;margin: 0;}
+    .menu{
+      /*这个样式不写，右键弹框会一直显示在画布的左下角*/
+      position: absolute;
+      background: rgba(3,3,3,0.6);
+      border-radius: 5px;
+      left: -99999px;
+      top: -999999px;
+    }
+    .menu ul{list-style: none}
+    .menu ul li{
+      padding: 5px 10px;
+      color: #ffff;
+      border-bottom: 1px dashed #ffffff;
+      font-size: 14px;
+    }
+    .menu ul li:last-child{
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div class="tree-container">
+  <div id="main" style="width: 2000px;height:2000px;">请稍等...</div>
+</div>
+
+<div id="rightMenu" class="menu" style="display: block;">
+  <ul>
+    <!--<li><a id="sql-content" name='test' href='sql.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF' target='_blank'>sql</a></li>-->
+    <li><div id="sql_content" name='test'  >sql</div></li>
+    <li><div id="copy_name"  >复制节点名称</div></li>
+    <li>掉线</li>
+  </ul>
+</div>
+<script type="text/javascript">
+  UrlParam = function() { // url参数
+    var data, index;
+    (function init() {
+      data = []; //值，如[["1","2"],["zhangsan"],["lisi"]]
+      index = {}; //键:索引，如{a:0,b:1,c:2}
+      var u = window.location.search.substr(1);
+      if (u != '') {
+        var params = decodeURIComponent(u).split('&');
+        for (var i = 0, len = params.length; i < len; i++) {
+          if (params[i] != '') {
+            var p = params[i].split("=");
+            if (p.length == 1 || (p.length == 2 && p[1] == '')) {// p | p= | =
+              data.push(['']);
+              index[p[0]] = data.length - 1;
+            } else if (typeof(p[0]) == 'undefined' || p[0] == '') { // =c 舍弃
+              continue;
+            } else if (typeof(index[p[0]]) == 'undefined') { // c=aaa
+              data.push([p[1]]);
+              index[p[0]] = data.length - 1;
+            } else {// c=aaa
+              data[index[p[0]]].push(p[1]);
+            }
+          }
+        }
+      }
+    })();
+    return {
+      // 获得参数,类似request.getParameter()
+      param : function(o) { // o: 参数名或者参数次序
+        try {
+          return (typeof(o) == 'number' ? data[o][0] : data[index[o]][0]);
+        } catch (e) {
+        }
+      },
+      //获得参数组, 类似request.getParameterValues()
+      paramValues : function(o) { // o: 参数名或者参数次序
+        try {
+          return (typeof(o) == 'number' ? data[o] : data[index[o]]);
+        } catch (e) {}
+      },
+      //是否含有paramName参数
+      hasParam : function(paramName) {
+        return typeof(paramName) == 'string' ? typeof(index[paramName]) != 'undefined' : false;
+      },
+      // 获得参数Map ,类似request.getParameterMap()
+      paramMap : function() {
+        var map = {};
+        try {
+          for (var p in index) { map[p] = data[index[p]]; }
+        } catch (e) {}
+        return map;
+      }
+    }
+  }();
+
+  $.ajax({
+    cache: false,
+    type: "GET",//重要参数1：请求的方式
+    //url : "G6_JSON_TREE.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF",//重要参数2：请求的文件名
+    url :UrlParam.paramValues("type")==1? "G6_JSON_TREE_20210713.php?id="+UrlParam.paramValues("target")+"":"G6_JSON_TREE.php?id="+UrlParam.paramValues("target")+"",
+    var: "",
+    //请求成功执行的function
+    success: function(msg){//重要参数3：msg是后台返回的数据，和js的reponsetext一样，如果后台没有返回数据则不会弹出。
+      alert("后台返回数据:"+msg);
+      alert("请求成功");
+      this.var = JSON.parse(msg);
+      var chartDom = document.getElementById('main');
+      var myChart = echarts.init(chartDom);
+      var option;
+
+
+      //var data ={"name":"dim_chs_ssm_sale_sys_code_info_df","children":[{"name":"ods_csxs_dm0_df","children":[{"name":"XSXSXT.dm0","children":[]}]},{"name":"ods_csxs_dm1_df","children":[{"name":"XSXSXT.DM1","children":[]}]},{"name":"ods_csxs_dm2_df","children":[{"name":"XSXSXT.DM2","children":[]}]},{"name":"ods_lyxs_dm0_df","children":[{"name":"LYXSXT.DM0","children":[]}]},{"name":"ods_lyxs_dm1_df","children":[{"name":"LYXSXT.DM1","children":[]}]},{"name":"ods_lyxs_dm2_df","children":[{"name":"LYXSXT.DM2","children":[]}]},{"name":"ods_nxxs_dm0_df","children":[{"name":"NXXSXT.dm0","children":[]}]},{"name":"ods_nxxs_dm1_df","children":[{"name":"NXXSXT.DM1","children":[]}]},{"name":"ods_nxxs_dm2_df","children":[{"name":"NXXSXT.DM2","children":[]}]},{"name":"ods_wcxs_dm0_df","children":[{"name":"WCXSXT2.dm0","children":[]},{"name":"WCXSXT2.DMO","children":[]}]},{"name":"ods_wcxs_dm1_df","children":[{"name":"WCXSXT2.DM1","children":[]}]},{"name":"ods_wcxs_dm2_df","children":[{"name":"WCXSXT2.DM2","children":[]}]},{"name":"ods_wsqy_dm0_df","children":[{"name":"XSXTUSER.DM0","children":[]}]},{"name":"ods_wsqy_dm1_df","children":[{"name":"XSXTUSER.DM1","children":[]}]},{"name":"ods_wsqy_dm2_df","children":[{"name":"XSXTUSER.DM2","children":[]}]}]};
+      var option = {
+        /*tooltip: {
+          trigger: 'item',
+          triggerOn: 'mousemove'
+        },20210716*/
+
+        tooltip: {
+          trigger: 'item',
+          triggerOn: 'mousemove',
+          enterable:true,//鼠标是否可进入提示框浮层中
+          formatter:formatterHover,//修改鼠标悬停显示的内容
+        },
+        series:[
+          {
+            type: 'tree',
+            id: 0,
+            name: 'tree1',
+            data: [this.var], //data为json对象，而非json字符串
+
+            top: '10%',
+            left: '8%',
+            bottom: '22%',
+            right: '20%',
+
+            symbolSize: 7,
+
+            edgeShape: 'polyline',
+            edgeForkPosition: '63%',
+            initialTreeDepth: 3,
+
+            lineStyle: {
+              width: 2
+            },
+
+            label: {
+              backgroundColor: '#fff',
+              position: 'left',
+              verticalAlign: 'middle',
+              align: 'right'
+            },
+
+            leaves: {
+              label: {
+                position: 'right',
+                verticalAlign: 'middle',
+                align: 'left'
+              }
+            },
+
+            emphasis: {
+              focus: 'descendant'
+            },
+
+            expandAndCollapse: true,
+            animationDuration: 550,
+            animationDurationUpdate: 750
+          }
+        ]
+      };
+      /**
+       * 鼠标悬停时显示详情
+       */
+      function formatterHover(params){
+        // console.log(params);
+        var deviceType = params.data.type;
+        if (deviceType === 'Internet' || deviceType === 'hub'){
+          return '<span style="position: relative;top: -10px;padding:0 5px;">'+ params.data.name+'</span>';
+          // return firstParams.name + '  ' + firstParams.seriesName + '<br>' + '装机：' + firstParams.data + ' 亿千瓦<br>增长率：' + sndParams.data +' %';
+        }  if (deviceType === 'switch'){
+          return '<span style="position: relative;top: -10px;padding: 0 5px;">设备类型：'+ params.data.name+'</span>'+ '<br>'
+                  + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">deep：'+ params.data.deep+'</span>'+ '<br>';
+        }else{
+          return '<span style="position: relative;top: -10px;padding: 0 5px;">设备类型：'+ params.data.name+'</span>'+ '<br>'
+                  + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">deep：'+ params.data.deep+'</span>'+ '<br>';
+        }
+      }
+      //去除默认的鼠标事件
+      $("#main").bind("contextmenu", function () { return false; });//防止默认菜单弹出（查看图像,图像另存为等）
+      myChart.on("contextmenu", function(params){
+        // console.log('params',params)
+
+        $('#rightMenu').css({
+          'display': 'block',
+          'left': params.event.offsetX + 15,
+          'top' : params.event.offsetY + 15,
+          //return params.data.name
+        });
+        $('#sql_content').click(function (){
+          window.open("sql.php?id="+params.data.name+"","sql详情");
+        });
+        $('#copy_name').click(function (){
+          const input = document.createElement('input');
+          document.body.appendChild(input);
+          input.setAttribute('value', params.data.name);
+          input.select();
+          if (document.execCommand('copy')) {
+            document.execCommand('copy');
+            console.log('复制成功');
+          }
+          document.body.removeChild(input);
+          $('#rightMenu').css({
+            'display': 'none',
+            'left': '-9999px',
+            'top': '-9999px'
+          });
+        });
+      });
+
+      /**
+       * 点击画布的时候隐藏右键菜单
+       */
+
+      $('.tree-container').click(function () {
+        //window.location.href="sql.php?="+params.data.name+"";
+
+        $('#rightMenu').css({
+          'display': 'none',
+          'left': '-9999px',
+          'top': '-9999px'
+        });
+      });
+      /**
+       * 右键还应添加“父节点”、“子节点”、“来源库”、“目标库”
+       */
+
+      option && myChart.setOption(option);
+    },
+    //请求成功失败执行的function
+    error:function(){
+      alert("请求失败");
+    }
+  });
+  // 基于准备好的dom，初始化echarts实例
+
+
+
+</script>
+</body>
+</html>

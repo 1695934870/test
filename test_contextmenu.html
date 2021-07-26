@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ECharts</title>
+  <!-- 引入 echarts.js -->
+  <script src="https://cdn.staticfile.org/echarts/5.1.0/echarts.min.js"></script>
+  <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+
+  <style>
+    *{padding: 0;margin: 0;}
+    .menu{
+      /*这个样式不写，右键弹框会一直显示在画布的左下角*/
+      position: absolute;
+      background: rgba(3,3,3,0.6);
+      border-radius: 5px;
+      left: -99999px;
+      top: -999999px;
+    }
+    .menu ul{list-style: none}
+    .menu ul li{
+      padding: 5px 10px;
+      color: #ffff;
+      border-bottom: 1px dashed #ffffff;
+      font-size: 14px;
+    }
+    .menu ul li:last-child{
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div class="tree-container">
+  <div id="main" style="width: 1000px;height:500px;"></div>
+</div>
+<!--右键弹出菜单-->
+<div id="rightMenu" class="menu" style="display: none;">
+  <ul>
+    <li>下线</li>
+    <li>上线</li>
+    <li>掉线</li>
+  </ul>
+</div>
+<script type="text/javascript">
+  // 基于准备好的dom，初始化echarts实例
+  var myChart = echarts.init(document.getElementById('main'));
+  var data = {
+    "name": "外部网络",
+    "type":"Internet",
+    "symbol": 'image://image/internet.png',
+    "children": [
+      {
+        "name": "交换机",
+        "type":"switch",
+        "IP":"192.168.30.126",
+        "MAC":"b0:98:6e:bf:6r:4c",
+        "deviceType":"交换机",
+        "deviceNum":"HUAWEI",
+        "symbol": 'image://image/switch.png',
+        "children": [
+          {
+            "name": "笔记本",
+            "type":"network",
+            "IP":"192.168.30.126",
+            "MAC":"b0:98:6e:bf:6r:4c",
+            "deviceType":"笔记本",
+            "account":"xiaox",
+            "location":"204",
+            "lastLoginTime":"2020-8-26",
+            "symbol": 'image://image/network.png',
+          },
+          {
+            "name": "计算机",
+            "type":"computer",
+            "IP":"192.168.30.126",
+            "MAC":"b0:98:6e:bf:6r:4c",
+            "deviceType":"计算机",
+            "account":"xiaox",
+            "location":"204",
+            "lastLoginTime":"2020-8-26",
+            "symbol": 'image://image/computer.png',
+            "children": [
+              {
+                "name": "计算机1",
+                "type":"computer",
+                "IP":"192.168.30.126",
+                "MAC":"b0:98:6e:bf:6r:4c",
+                "deviceType":"计算机1",
+                "account":"xiaox",
+                "location":"204",
+                "lastLoginTime":"2020-8-26",
+                "symbol": 'image://image/computer.png',
+              },
+              {
+                "name": "计算机2",
+                "type":"computer",
+                "IP":"192.168.30.126",
+                "MAC":"b0:98:6e:bf:6r:4c",
+                "deviceType":"计算机2",
+                "account":"xiaox",
+                "location":"204",
+                "lastLoginTime":"2020-8-26",
+                "symbol": 'image://image/computer.png',
+              },
+              {
+                "name": "计算机3",
+                "type":"computer",
+                "IP":"192.168.30.126",
+                "MAC":"b0:98:6e:bf:6r:4c",
+                "deviceType":"计算机3",
+                "account":"xiaox",
+                "location":"204",
+                "lastLoginTime":"2020-8-26",
+                "symbol": 'image://image/computer.png',
+              },
+              {
+                "name": "计算机4",
+                "type":"computer",
+                "IP":"192.168.30.126",
+                "MAC":"b0:98:6e:bf:6r:4c",
+                "deviceType":"计算机4",
+                "account":"xiaox",
+                "location":"204",
+                "lastLoginTime":"2020-8-26",
+                "symbol": 'image://image/computer.png',
+              }
+            ]
+          },
+          {
+            "name": "路由器",
+            "type":"rooter",
+            "IP":"192.168.30.126",
+            "MAC":"b0:98:6e:bf:6r:4c",
+            "deviceType":"路由器",
+            "account":"xiaox",
+            "location":"204",
+            "lastLoginTime":"2020-8-26",
+            "symbol": 'image://image/rooter.png',
+          },
+          {
+            "name": "服务器",
+            "type":"service",
+            "IP":"192.168.30.126",
+            "MAC":"b0:98:6e:bf:6r:4c",
+            "deviceType":"服务器",
+            "account":"xiaox",
+            "location":"204",
+            "lastLoginTime":"2020-8-26",
+            "symbol": 'image://image/service.png',
+          },
+          {
+            "name": "打印机",
+            "type":"print",
+            "IP":"192.168.30.126",
+            "MAC":"b0:98:6e:bf:6r:4c",
+            "deviceType":"打印机",
+            "account":"xiaox",
+            "location":"204",
+            "lastLoginTime":"2020-8-26",
+            "symbol": 'image://image/print.png',
+          },
+          {
+            "name": "计算机",
+            "type":"computer",
+            "IP":"192.168.30.126",
+            "MAC":"b0:98:6e:bf:6r:4c",
+            "deviceType":"计算机",
+            "account":"xiaox",
+            "location":"204",
+            "lastLoginTime":"2020-8-26",
+            "symbol": 'image://image/computer.png',
+          }
+        ]
+      },
+      {
+        "name": "无线交换机",
+        "type":"switch",
+        "IP":"192.168.30.126",
+        "MAC":"b0:98:6e:bf:6r:4c",
+        "deviceType":"交换机",
+        "deviceNum":"HUAWEI",
+        "symbol": 'image://image/switch.png',
+        "children": [
+          {
+            "name": "手机",
+            "type":"phone",
+            "IP":"192.168.30.126",
+            "MAC":"b0:98:6e:bf:6r:4c",
+            "deviceType":"手机",
+            "account":"xiaox",
+            "location":"204",
+            "lastLoginTime":"2020-8-26",
+            "symbol": 'image://image/phone.png',
+          },
+          {
+            "name": "平板",
+            "type":"phone",
+            "IP":"192.168.30.126",
+            "MAC":"b0:98:6e:bf:6r:4c",
+            "deviceType":"平板",
+            "account":"xiaox",
+            "location":"204",
+            "lastLoginTime":"2020-8-26",
+            "symbol": 'image://image/phone.png',
+          }
+        ]
+      },
+      {
+        "name": "hub",
+        "type":"hub",
+        "symbol": 'image://image/hub.png',
+        "children": [
+          {
+            "name": "计算机",
+            "type":"computer",
+            "IP":"192.168.30.126",
+            "MAC":"b0:98:6e:bf:6r:4c",
+            "deviceType":"计算机",
+            "account":"xiaox",
+            "location":"204",
+            "lastLoginTime":"2020-8-26",
+            "symbol": 'image://image/computer.png',
+          },
+          {
+            "name": "笔记本",
+            "type":"phone",
+            "IP":"192.168.30.126",
+            "MAC":"b0:98:6e:bf:6r:4c",
+            "deviceType":"手机",
+            "account":"xiaox",
+            "location":"204",
+            "lastLoginTime":"2020-8-26",
+            "symbol": 'image://image/phone.png',
+          },
+          {
+            "name": "打印机",
+            "type":"print",
+            "IP":"192.168.30.126",
+            "MAC":"b0:98:6e:bf:6r:4c",
+            "deviceType":"打印机",
+            "account":"xiaox",
+            "location":"204",
+            "lastLoginTime":"2020-8-26",
+            "symbol": 'image://image/print.png',
+          },
+          {
+            "name": "路由器",
+            "type":"rooter",
+            "IP":"192.168.30.126",
+            "MAC":"b0:98:6e:bf:6r:4c",
+            "deviceType":"路由器",
+            "account":"xiaox",
+            "location":"204",
+            "lastLoginTime":"2020-8-26",
+            "symbol": 'image://image/rooter.png',
+          }
+        ]
+      }
+    ]
+  };
+  //		页面初始化的时候,隐藏奇数位的子节点
+  //		echarts.util.each(data.children, function (datum, index) {
+  //	        index % 2 === 0 && (datum.collapsed = true);
+  //	    });
+  //         console.log('data',data);
+  // 		console.log('link',link);
+  var option = {
+    tooltip: {
+      trigger: 'item',
+      triggerOn: 'mousemove',
+      enterable:true,//鼠标是否可进入提示框浮层中
+      formatter:formatterHover,//修改鼠标悬停显示的内容
+    },
+    series: [
+      {
+        type: 'tree',
+        data: [data],
+        top: '1%',
+        left: '7%',
+        bottom: '1%',
+        right: '20%',
+        label: {
+          position: 'left',
+          verticalAlign: 'middle',
+          align: 'right',
+          fontSize: 9
+        },
+        leaves: {
+          label: {
+            position: 'right',
+            verticalAlign: 'middle',
+            align: 'left'
+          }
+        },
+        symbolSize: [30, 30],
+        edgeForkPosition: "72%",
+        roam:true,//鼠标缩放，拖拽整颗树
+        expandAndCollapse: true,//无关的子树折叠收起
+        animationDuration: 550,
+        animationDurationUpdate: 750,
+        width: "50%"//组件宽度
+      }
+    ]
+  }
+  /**
+   * 鼠标悬停时显示详情
+   */
+  function formatterHover(params){
+    // console.log(params);
+    var deviceType = params.data.type;
+    var imgPath = params.data.symbol;
+    //图片地址截取，因为echarts修改图片的时候有一个------image://---前缀，前缀后面的才是图片真正的地址
+    var imgPathSrc = imgPath.split("image://")[1];
+    // console.log('str',imgPathSrc);
+    if (deviceType === 'Internet' || deviceType === 'hub'){
+      return "<img src='"+imgPathSrc+" ' width='30px' height='30px'>" + '<span style="position: relative;top: -10px;padding:0 5px;">'+ params.data.name+'</span>';
+      // return firstParams.name + '  ' + firstParams.seriesName + '<br>' + '装机：' + firstParams.data + ' 亿千瓦<br>增长率：' + sndParams.data +' %';
+    }  if (deviceType === 'switch'){
+      return "<img src='"+imgPathSrc+" ' width='30px' height='30px'>" + '<span style="position: relative;top: -10px;padding: 0 5px;">设备类型：'+ params.data.name+'</span>'+ '<br>'
+              + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">IP：'+ params.data.IP+'</span>'+ '<br>'
+              + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">MAC：'+ params.data.MAC+'</span>'+ '<br>'
+              + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">设备型号：'+ params.data.deviceNum+'</span>';
+    }else{
+      return "<img src='"+imgPathSrc+" ' width='30px' height='30px'>" + '<span style="position: relative;top: -10px;padding: 0 5px;">设备类型：'+ params.data.name+'</span>'+ '<br>'
+              + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">IP：'+ params.data.IP+'</span>'+ '<br>'
+              + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">MAC：'+ params.data.MAC+'</span>'+ '<br>'
+              + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">账号：'+ params.data.account+'</span>'+ '<br>'
+              + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">所在位置：'+ params.data.location+'</span>'+ '<br>'
+              + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">最后登录时间：'+ params.data.lastLoginTime+'</span>';
+    }
+  }
+  /**
+   * 鼠标右键，弹出右键操作菜单
+   */
+  $("#main").bind("contextmenu", function () { return false; });//防止默认菜单弹出（查看图像,图像另存为等）
+  myChart.on("contextmenu", function(params){
+    // console.log('params',params)
+    $('#rightMenu').css({
+      'display': 'block',
+      'left': params.event.offsetX + 15,
+      'top' : params.event.offsetY + 15
+    });
+    //todo 右键菜单刚弹出时，隐藏鼠标悬停菜单
+    $("#main>div:nth-child(2)").hide();
+  });
+  /**
+   * 点击画布的时候隐藏右键菜单
+   */
+  $('.tree-container').click(function () {
+    $('#rightMenu').css({
+      'display': 'none',
+      'left': '-9999px',
+      'top': '-9999px'
+    });
+  });
+  /**
+   * 解决echarts图片首次加载不显示的问题
+   */
+  setTimeout(function(){
+    $(myChart).resize();
+  },200);
+  /**
+   * 解决点击父节点合并或展开后子节点图片不显示的问题
+   */
+  $(window).on('click',function(){
+    $(myChart).resize();
+  });
+  myChart.setOption(option);
+</script>
+</body>
+</html>

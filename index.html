@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Insert title here</title>
+  <script type="text/javascript">
+    var itemHeight = 40;
+    var dividerHeight = 1;
+
+    function openMenu(obj) {
+      menuTitleId = obj.id;
+      menuId = "menu" + menuTitleId.substring(10);
+      indicatorId = "indicator" + menuTitleId.substring(10);
+
+      menu = document.getElementById(menuId);
+      indicator = document.getElementById(indicatorId);
+      height = menu.style.height;
+
+      if (height == "0px" || height == "") {
+        //childAmount = menu.getElementsByTagName('div').length/2;
+        childAmount = menu.getElementsByClassName('item').length;
+        dividerAmount = menu.getElementsByTagName('li').length;
+        height = childAmount * itemHeight + dividerAmount * dividerHeight;
+        menu.style.height = height + "px";
+        indicator.style.transform = "rotate(180deg)";
+      } else {
+        menu.style.height = "0px";
+        indicator.style.transform = "rotate(0deg)";
+      }
+
+    }
+    function openItems(id,child){
+      child.style.display=(child.style.display =='none')?'':'none';
+      menuTitleId = id;
+      menuId = "menu" + menuTitleId.substring(10);
+      indicatorId = "indicator" + menuTitleId.substring(10);
+
+      menu = document.getElementById(menuId);
+      indicator = document.getElementById(indicatorId);
+      height = parseInt(menu.style.height.replace('px',''));
+
+      if(child.style.display !='none'){
+        childAmount = child.getElementsByTagName('br').length+1.2;
+        height = height + childAmount * itemHeight/2 ;
+        menu.style.height = height + "px";
+        indicator.style.transform = "rotate(180deg)";
+      }
+      else{
+        childAmount = child.getElementsByTagName('br').length+1.2;
+        height = height - childAmount * itemHeight/2 ;
+        menu.style.height = height + "px";
+        indicator.style.transform = "rotate(180deg)";
+      }
+    }
+
+    /*function loadjson( _json )
+    {
+      if( _json )
+      {
+        var content1 = document.getElementById('content1');
+        for(var i=0; i < _json.length; i++)
+        {
+          console.log(_json[i].sql);
+          //console.log(_json[i].title);
+          //console.log(_json[i].alt);
+          content1.innerHTML = _json[i].sql;
+          out.print("你好");
+        }
+      }
+    }*/
+
+    function getjson(id){
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET','content.php?id='+id,true);
+      xhr.send(null);
+      xhr.onreadystatechange = function(){
+        if(xhr.readyState == 4){
+          var resText = xhr.responseText;
+          $jsonstr = eval("("+resText+")");//需要用eval函数将返回的串转化成可用的strig串，eval(data)，但是因为原串里面是以{}开始和结束的，会被认为是可执行方法，因此需要加上()包围起来
+          console.log($jsonstr.sql);
+          document.getElementById('content').innerText = $jsonstr.sql;
+        }
+      }
+    }
+
+    function href_target_table_task(){  //按任务名称搜索20210714
+      var url = "tree.html?type=1&target=" + document.getElementById("input").value;  //type为1，表示按任务名称搜索
+      window.open(url,"树形图");
+    }
+
+    function href_target_table(){  //按目标表搜索
+      var url = "tree.html?type=2&target=" + document.getElementById("input").value;  //type为1，表示按任务名称搜索
+      window.open(url,"树形图");
+    }
+
+  </script>
+  <style>
+    .menus {
+      width: 320px;
+      overflow: hidden;
+      box-shadow: 1px 1px 4px gray;
+      /* border-bottom: 1px solid black;
+      border-top: 1px solid black; */
+      border: 1px solid gray;
+      border-radius: 5px;
+    }
+
+    .menu {
+      overflow: hidden;
+      height: 0px;
+      transition: all 0.3s ease;
+    }
+
+    .menu_title {
+      width: 305px;
+      height: 50px;
+      line-height: 50px;
+      background: #fafafa;
+      color: gray;
+      font-size: 20px;
+      padding-left: 15px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      font-weight: bold;
+      overflow: hidden;
+    }
+
+    .menu_title:hover {
+      background: #dedede;
+      color: black;
+    }
+
+    .indicator {
+      width: 50px;
+      height: 50px;
+      font-weight: bold;
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      transition: all 0.3s ease;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .item {
+      width: 290px;
+      height: 40px;
+      line-height: 40px;
+      background: gray;
+      color: white;
+      padding-left: 30px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .item:hover {
+      background: #B22222;
+    }
+
+    .item a {
+      width: 290px;
+      height: 40px;
+      display: block;
+      text-decoration: none;
+      color: white;
+      text-decoration: none;
+    }
+
+    .item_divider {
+      width: 322px;
+      height: 1px;
+      background: white;
+      display: block;
+      opacity: 0.8;
+    }
+
+    .menu_divider {
+      width: 100%;
+      height: 1px;
+      background: gray;
+    }
+    .item_child{
+      width: 100%;
+      height: 40px;
+      /* line-height: 40px;*/
+      /*background: gray;*/
+      color: deepskyblue;
+      /*padding-left: 75px;
+      padding-right: 75px;
+      text-align: justify;*/
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .item_child:hover{
+      color: #B22222;
+    }
+    .left{
+      position: absolute;
+      width: 200px;
+      height:200px;
+      /*background-color: red;*/
+    }
+    .right{
+      position: absolute;
+      height: 200px;
+      margin-left:360px;
+      /*background-color: blue;*/
+      text-align: left;
+    }
+
+  </style>
+  <title>目录树</title>
+</head>
+<body>
+<div align="left" >
+
+  <!--<form action="Tree.html"  method="get" target='_blank'>
+    <input name="target" value="请输目标表" type="text"/>
+    </br>
+    <input name="btnSearch" type="submit" value="Search" />
+  </form>-->
+
+
+  <form action="Tree.html" name="search" method="get" target='_blank'>
+    <input id="input" name="target" value="请输目标表" size="27" type="text"/>
+    </br>
+    <button onclick="href_target_table_task()"/>按任务名称搜索</button>
+    <button onclick="href_target_table()"/>按目标表搜索</button>
+  </form>
+  </br>
+  </br>
+  <table>
+    <tr>
+      <th class="left">
+        <div class="menus">
+
+          <div id="menu_title1" class="menu_title" onclick="openMenu(this)">
+            新建商品房
+            <div class="indicator" id="indicator1">^</div>
+          </div>
+          <div class="menu" id="menu1">
+
+            <!--<a href="TEST.php?id=" target='_blank'>新建商品房-供销报表</h>-->
+            <div id="main1" class="item" style="color:white" onclick="openItems('menu_title1',child1)" >
+              新建商品房-供销报表</div>
+            <div id="child1" style="display:none" >
+              <!--<a class="item_child" href="TEST.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF" target='_blank'>ADS_NEWHOS_SUPPLY_SALE_RP_MF</a> <br>-->
+              <a class="item_child" href="TEST.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF" target='_blank'>ADS_NEWHOS_SUPPLY_SALE_RP_MF</a> <br>
+              <!--<a href="sql.php?id=新建商品房-供销报表" target='_blank'>- ds1_用途细分</h> <br>-->
+              <h class="item_child" onclick="getjson('新建商品房-供销报表- ds1_用途细分')" >- ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供销报表- ds2_所属板块')" >- ds2_所属板块</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-供销报表- ds1_供销总量')" >- ds1_供销总量</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-供销报表- ds2_用途细分')" >- ds2_用途细分</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-供销报表- ds1_所属板块')" >- ds1_所属板块</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-供销报表- ds1_年份')" >- ds1_年份</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-供销报表- ds2_性质细分')" >- ds2_性质细分</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-供销报表- ds1_区域,用途,房屋性质,装修情况')" >- ds1_区域,用途,房屋性质,装修情况</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-供销报表- ds1_性质细分')" >- ds1_性质细分</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-供销报表- ds2_供销走势')" >- ds2_供销走势</h>
+            </div>
+
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>新建商品房-价格报表-价格总量</a>
+            </div>-->
+            <div id="main2" class="item" style="color:white" onclick="openItems('menu_title1',child2)" >
+              新建商品房-价格报表-价格总量 </div>
+            <div id="child2" style="display:none">
+              <!--<a href="TEST.php?id=ADS_NEWHOS_PRICE_RP_MF" target='_blank'>ADS_NEWHOS_PRICE_RP_MF</a> <br>-->
+              <a href="tree.html?target=ADS_NEWHOS_PRICE_RP_MF" target='_blank'>ADS_NEWHOS_PRICE_RP_MF</a>
+              <h class="item_child" onclick="getjson('新建商品房-价格报表-价格总量- ds1_用途细分')" >- ds1_用途细分</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-价格报表-价格总量- ds1_价格总量_面积段')" >- ds1_价格总量_面积段</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-价格报表-价格总量- ds1_价格总量_中位数')" >- ds1_价格总量_中位数</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-价格报表-价格总量- ds1_所属板块')" >- ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-价格报表-价格总量- ds1_年份')" >- ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-价格报表-价格总量- ds1_价格总量_价格')" >- ds1_价格总量_价格</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-价格报表-价格总量- ds1_区域,用途,房屋性质,装修情况')" >- ds1_区域,用途,房屋性质,装修情况</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-价格报表-价格总量- ds1_性质细分')" >- ds1_性质细分</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>新建商品房-价格报表-价格走势</a>
+            </div>-->
+            <div id="main3" class="item" style="color:white" onclick="openItems('menu_title1',child3)" >
+              新建商品房-价格报表-价格走势 </div>
+            <div id="child3" style="display:none">
+              <a href="TEST.php?id=ADS_NEWHOS_PRICE_RP_MF" target='_blank'>ADS_NEWHOS_PRICE_RP_MF</a> <br>
+              <h class="item_child" onclick="getjson('新建商品房-价格报表-价格走势- ds2_所属板块')" >- ds2_所属板块</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-价格报表-价格走势- ds2_用途细分')" >- ds2_用途细分</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-价格报表-价格走势- ds2_价格走势_价格段走势')" >- ds2_价格走势_价格段走势</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-价格报表-价格走势- ds1_年份')" >- ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-价格报表-价格走势- ds2_价格走势_价格走势')" >- ds2_价格走势_价格走势</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-价格报表-价格走势- ds2_性质细分')" >- ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-价格报表-价格走势- ds1_区域,用途,房屋性质,装修情况')" >- ds1_区域,用途,房屋性质,装修情况</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>新建商品房-供销结构报表</a>
+            </div>-->
+            <div id="main4" class="item" style="color:white" onclick="openItems('menu_title1',child4)" >
+              新建商品房-供销结构报表 </div>
+            <div id="child4" style="display:none">
+              <a href="TEST.php?id=NEWHOS_SUPPLY_SALE_STRUC_RP" target='_blank'>NEWHOS_SUPPLY_SALE_STRUC_RP</a> <br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds1_用途细分')" >- ds1_用途细分</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds3_所属板块')" >- ds3_所属板块</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds3_性质细分')" >- ds3_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds2_成交价位段结构_总价段')" >- ds2_成交价位段结构_总价段</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds1_性质细分')" >- ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds2_成交价位段结构_单价段')" >- ds2_成交价位段结构_单价段</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds1_年份升序')" >- ds1_年份升序</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds2_所属板块')" >- ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds3_价位段占比_单价段')" >- ds3_价位段占比_单价段</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds2_用途细分')" >- ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds3_用途细分')" >- ds3_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds1_所属板块')" >- ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds1_供销结构')" >- ds1_供销结构</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds2_性质细分')" >- ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds3_价位段占比_总价段')" >- ds3_价位段占比_总价段</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供销结构报表- ds1_区域,用途,房屋性质,装修情况')" >- ds1_区域,用途,房屋性质,装修情况</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>新建商品房-区域结构</a>
+            </div>-->
+            <div id="main5" class="item" style="color:white" onclick="openItems('menu_title1',child5)" >
+              新建商品房-区域结构 </div>
+            <div id="child5" style="display:none">
+              <a href="TEST.php?id=NEWHOS_REGION_STRUC_RATIO_RP" target='_blank'>NEWHOS_REGION_STRUC_RATIO_RP</a> <br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds1_用途细分')" >- ds1_用途细分</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds2_区域，用途，房屋性质，装修')" >- ds2_区域，用途，房屋性质，装修</h> <br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds3_项目交易情况')" >- ds3_项目交易情况</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds3_所属板块')" >- ds3_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds2_区域成交段位特征_单价段')" >- ds2_区域成交段位特征_单价段</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds3_性质细分')" >- ds3_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds2_区域成交段位特征_面积段')" >- ds2_区域成交段位特征_面积段</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds3_区域，用途，房屋性质，装修')" >- ds3_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds1_性质细分')" >- ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds3_项目名称')" >- ds3_项目名称</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds1_区域，用途，房屋性质，装修')" >- ds1_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds2_所属板块')" >- ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds1_区域占比')" >- ds1_区域占比</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds2_用途细分')" >- ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds3_用途细分')" >- ds3_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds1_所属板块')" >- ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds2_性质细分')" >- ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-区域结构- ds1_年份排序')" >- ds1_年份排序</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=">新建商品房-购房者特征(全市)</a>
+            </div>-->
+            <div id="main6" class="item" style="color:white" onclick="openItems('menu_title1',child6)" >
+              新建商品房-购房者特征(全市) </div>
+            <div id="child6" style="display:none">
+              <a href="TEST.php?id=NEWHOS_BUYER_STRUC_HPG_RP" target='_blank'>NEWHOS_BUYER_STRUC_HPG_RP</a> <br>
+              <a href="TEST.php?id=NEWHOS_BUYER_STRUC_HPG_RP" target='_blank'>NEWHOS_BUYER_STRUC_OTHER_RP</a> <br>
+              <a href="TEST.php?id=NEWHOS_BUYER_STRUC_RPR_RP" target='_blank'>NEWHOS_BUYER_STRUC_RPR_RP</a> <br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_置业一次')" >ds2_置业一次</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds3_所属板块')" >ds3_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds3_户型_趋势')" >ds3_户型_趋势</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds3_其他购房者特征_贷款方式')" >ds3_其他购房者特征_贷款方式</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds3_性质细分')" >ds3_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds3_贷款方式_趋势')" >ds3_贷款方式_趋势</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_区域，用途，房屋性质，装修')" >ds2_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds3_其他购房者特征情况_同比')" >ds3_其他购房者特征情况_同比</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_年份排序')" >ds2_年份排序</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_置业三次以上')" >ds2_置业三次以上</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds3_其他购房者特征_户型_同比')" >ds3_其他购房者特征_户型_同比</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_置业套数占比')" >ds2_置业套数占比</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds3_用途细分')" >ds3_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds3_户型特征')" >ds3_户型特征</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds3_年龄占比_趋势')" >ds3_年龄占比_趋势</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds1_外省户籍在长购房top10')" >ds1_外省户籍在长购房top10</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds1_户籍类型详细_表格')" >ds1_户籍类型详细_表格</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_置业次数占比')" >ds2_置业次数占比</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds3_其他购房者特征趋势_年龄段_同比')" >ds3_其他购房者特征趋势_年龄段_同比</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds3_年份排序')" >ds3_年份排序</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds1_户籍购房者占比走势')" >ds1_户籍购房者占比走势</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds3_年龄特征')" >ds3_年龄特征</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_置业总套数')" >ds2_置业总套数</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds3_区域，用途，房屋性质，装修')" >ds3_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_置业一套')" >ds2_置业一套</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_置业三套以上')" >ds2_置业三套以上</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_置业二次')" >ds2_置业二次</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_置业套数走势')" >ds2_置业套数走势</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_置业二套')" >ds2_置业二套</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds1_户籍总数_表格')" >ds1_户籍总数_表格</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds2_置业次数走势')" >ds2_置业次数走势</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds1_本省其他地市在长购房排名')" >ds1_本省其他地市在长购房排名</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds1_年份排序')" >ds1_年份排序</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(全市)- ds1_区域，用途，房屋性质，装修情况')" >ds1_区域，用途，房屋性质，装修情况</h>
+
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>新建商品房-购房者特征(限购区)</a>
+            </div>-->
+            <div id="main7" class="item" style="color:white" onclick="openItems('menu_title1',child7)" >
+              新建商品房-购房者特征(限购区) </div>
+            <div id="child7" style="display:none">
+              <a href="TEST.php?id=NEWHOS_XGQ_BUYER_STRUC_HPG" target='_blank'>NEWHOS_XGQ_BUYER_STRUC_HPG</a><br>
+              <a href="TEST.php?id=NEWHOS_XGQ_BUYER_STRUC_OTHER" target='_blank'>NEWHOS_XGQ_BUYER_STRUC_OTHER</a><br>
+              <a href="TEST.php?id=NEWHOS_XGQ_BUYER_STRUC_RPR" target='_blank'>NEWHOS_XGQ_BUYER_STRUC_RPR</a><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_置业一次')" >ds2_置业一次</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds3_所属板块')" >ds3_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds3_户型_趋势')" >ds3_户型_趋势</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds3_其他购房者特征_贷款方式')" >ds3_其他购房者特征_贷款方式</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds3_性质细分')" >ds3_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds3_贷款方式_趋势')" >ds3_贷款方式_趋势</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_区域，用途，房屋性质，装修')" >ds2_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds3_其他购房者特征情况_同比')" >ds3_其他购房者特征情况_同比</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_年份排序')" >ds2_年份排序</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_置业三次以上')" >ds2_置业三次以上</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds3_其他购房者特征_户型_同比')" >ds3_其他购房者特征_户型_同比</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_置业套数占比')" >ds2_置业套数占比</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds3_用途细分')" >ds3_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds3_户型特征')" >ds3_户型特征</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds3_年龄占比_趋势')" >ds3_年龄占比_趋势</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds1_外省户籍在长购房top10')" >ds1_外省户籍在长购房top10</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds1_户籍类型详细_表格')" >ds1_户籍类型详细_表格</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_置业次数占比')" >ds2_置业次数占比</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds3_其他购房者特征趋势_年龄段_同比')" >ds3_其他购房者特征趋势_年龄段_同比</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds3_年份排序')" >ds3_年份排序</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds1_户籍购房者占比走势')" >ds1_户籍购房者占比走势</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds3_年龄特征')" >ds3_年龄特征</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_置业总套数')" >ds2_置业总套数</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds3_区域，用途，房屋性质，装修')" >ds3_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_置业一套')" >ds2_置业一套</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_置业三套以上')" >ds2_置业三套以上</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_置业二次')" >ds2_置业二次</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_置业套数走势')" >ds2_置业套数走势</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_置业二套')" >ds2_置业二套</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds1_户籍总数_表格')" >ds1_户籍总数_表格</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds2_置业次数走势')" >ds2_置业次数走势</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds1_本省其他地市在长购房排名')" >ds1_本省其他地市在长购房排名</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds1_年份排序')" >ds1_年份排序</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-购房者特征(限购区)- ds1_区域，用途，房屋性质，装修情况')" >ds1_区域，用途，房屋性质，装修情况</h>
+
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>新建商品房-库存结构</a>
+            </div>-->
+            <div id="main8" class="item" style="color:white" onclick="openItems('menu_title1',child8)" >
+              新建商品房-库存结构 </div>
+            <div id="child8" style="display:none">
+              <a href="TEST.php?id=NEWHOS_STOCK_STRUC_AR_RP" target='_blank'>NEWHOS_STOCK_STRUC_AR_RP</a><br>
+              <a href="TEST.php?id=NEWHOS_STOCK_STRUC_SUM_RP" target='_blank'>NEWHOS_STOCK_STRUC_SUM_RP</a><br>
+              <a href="TEST.php?id=NEWHOS_STOCK_STRUC_YEARS_RP" target='_blank'>NEWHOS_STOCK_STRUC_YEARS_RP</a><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存结构- ds1_库存面积段')" >ds1_库存面积段</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存结构- ds1_区域，用途，房屋性质，装修')" >ds1_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存结构- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存结构- ds2_年份排序')" >ds2_年份排序</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存结构- ds1_库存年限')" >ds1_库存年限</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存结构- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存结构- ds1_ 库存总量结构')" >ds1_ 库存总量结构</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存结构- ds2_库存面积走势')" >ds2_库存面积走势</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存结构- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存结构- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存结构- ds1_性质细分')" >ds1_性质细分</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>新建商品房-年度报表</a>
+            </div>-->
+            <div id="main10" class="item" style="color:white" onclick="openItems('menu_title1',child10)" >
+              新建商品房-年度报表 </div>
+            <div id="child10" style="display:none">
+              <a href="TEST.php?id=ADS_NEWHOS_YEAR_SUM_RP_DF" target='_blank'>ADS_NEWHOS_YEAR_SUM_RP_DF</a><br>
+              <a href="TEST.php?id=ADS_NEWHOS_YEAR_TREND_RP_DF" target='_blank'>ADS_NEWHOS_YEAR_TREND_RP_DF</a><br>
+              <a href="TEST.php?id=NEWHOS_YEAR_TREND_RATIO_RP" target='_blank'>NEWHOS_YEAR_TREND_RATIO_RP</a><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds1_年限（供应面积，供应套数）')" >ds1_年限（供应面积，供应套数）</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds2_年度趋势图')" >ds2_年度趋势图</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds3_年度占比趋势变化_面积段')" >ds3_年度占比趋势变化_面积段</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds3_所属板块')" >ds3_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds3_性质细分')" >ds3_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds3_年度占比趋势变化_总价段')" >ds3_年度占比趋势变化_总价段</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds3_年份排序')" >ds3_年份排序</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds2_区域，用途，房屋性质，装修')" >ds2_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds1_年份降序')" >ds1_年份降序</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds3_年度占比趋势变化_购房者结构')" >ds3_年度占比趋势变化_购房者结构</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds3_区域，用途，房屋性质，装修')" >ds3_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds1_区域，用途，房屋性质，装修')" >ds1_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds1_面积，套数')" >ds1_面积，套数</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds3_用途细分')" >ds3_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds1_面积段')" >ds1_面积段</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-年度报表- ds3_年度占比趋势变化_单价段')" >ds3_年度占比趋势变化_单价段</h>
+
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=">新建商品房-契税结构</a>
+            </div>-->
+            <div id="main11" class="item" style="color:white" onclick="openItems('menu_title1',child11)" >
+              新建商品房-契税结构 </div>
+            <div id="child11" style="display:none">
+              <a href="TEST.php?id=NEWHOS_DEED_TAX_STRUC_RP" target='_blank'>NEWHOS_DEED_TAX_STRUC_RP</a><br>
+              <h class="item_child" onclick="getjson('新建商品房-契税结构- ds1_区域，用途，房屋性质，装修')" >ds1_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-契税结构- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-契税结构- ds1_完税情况')" >ds1_完税情况</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-契税结构- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-契税结构- ds1_年份排序')" >ds1_年份排序</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-契税结构- ds1_性质细分')" >ds1_性质细分</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>新建商品房-供应明细</a>
+            </div>-->
+            <div id="main12" class="item" style="color:white" onclick="openItems('menu_title1',child12)" >
+              新建商品房-供应明细 </div>
+            <div id="child12" style="display:none">
+              <a href="TEST.php?id=NEWHOS_FIX_ROOM_SUPPLY_DETAIL" target='_blank'>NEWHOS_FIX_ROOM_SUPPLY_DETAIL</a><br>
+              <a href="TEST.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF" target='_blank'>ADS_NEWHOS_SUPPLY_SALE_RP_MF</a><br>
+              <h class="item_child" onclick="getjson('新建商品房-供应明细- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供应明细- ds2—区域')" >ds2—区域</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供应明细- ds2-项目名称')" >ds2-项目名称</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供应明细- ds2_板块')" >ds2_板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供应明细- ds2_开发公司')" >ds2_开发公司</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-供应明细- ds2-是否包含')" >ds2-是否包含</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>新建商品房-成交明细</a>
+            </div>-->
+            <div id="main13" class="item" style="color:white" onclick="openItems('menu_title1',child13)" >
+              新建商品房-成交明细 </div>
+            <div id="child13" style="display:none">
+              <a href="TEST.php?id=NEWHOS_FIX_CONTRACT_DETAIL" target='_blank'>NEWHOS_FIX_CONTRACT_DETAIL</a><br>
+              <a href="TEST.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF" target='_blank'>ADS_NEWHOS_SUPPLY_SALE_RP_MF</a><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds2—区域')" >ds2—区域</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds2-项目名称')" >ds2-项目名称</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds2_板块')" >ds2_板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds2_开发公司')" >ds2_开发公司</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds2-是否包含')" >ds2-是否包含</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>新建商品房-库存明细</a>
+            </div>-->
+            <div id="main14" class="item" style="color:white" onclick="openItems('menu_title1',child14)" >
+              新建商品房-库存明细 </div>
+            <div id="child14" style="display:none">
+              <a href="TEST.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF" target='_blank'>ADS_NEWHOS_SUPPLY_SALE_RP_MF</a><br>
+              <a href="TEST.php?id=NEWHOS_FIX_ROOM_STOCK_DETAIL" target='_blank'>NEWHOS_FIX_ROOM_STOCK_DETAIL</a><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存明细- ds2—区域')" >ds2—区域</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存明细- ds2-项目名称')" >ds2-项目名称</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存明细- ds2_板块')" >ds2_板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存明细- ds2_开发公司')" >ds2_开发公司</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存明细- 库存明细')" >库存明细</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存明细- ds2_月份')" >ds2_月份</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存明细- ds2-是否包含')" >ds2-是否包含</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>新建商品房-契税明细</a>
+            </div>-->
+            <div id="main15" class="item" style="color:white" onclick="openItems('menu_title1',child15)" >
+              新建商品房-契税明细 </div>
+            <div id="child15" style="display:none">
+              <a href="TEST.php?id=NEWHOS_FIX_DEED_TAX_DETAIL" target='_blank'>NEWHOS_FIX_DEED_TAX_DETAIL</a><br>
+              <a href="TEST.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF" target='_blank'>ADS_NEWHOS_SUPPLY_SALE_RP_MF</a><br>
+              <h class="item_child" onclick="getjson('新建商品房-契税明细- ds2_是否包含')" >ds2_是否包含</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-契税明细- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-契税明细- ds2_项目名称')" >ds2_项目名称</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-契税明细- ds2_板块')" >ds2_板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-契税明细- ds2_开发公司')" >ds2_开发公司</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-契税明细- ds2_区域')" >ds2_区域</h>
+            </div>
+          </div>
+
+          <li class="menu_divider"></li>
+
+          <div id="menu_title2" class="menu_title" onclick="openMenu(this)">
+            住建局固化表
+            <div class="indicator" id="indicator2">^</div>
+          </div>
+          <div class="menu" id="menu2">
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>商品房上市供应情况表</a>
+            </div>-->
+            <div id="main16" class="item" style="color:white" onclick="openItems('menu_title2',child16)" >
+              商品房上市供应情况表</div>
+            <div id="child16" style="display:none" >
+              <a href="TEST.php?id=ZJJGH_SUPPLY_STOCK_RP" target='_blank'>ZJJGH_SUPPLY_STOCK_RP</a><br>
+              <h class="item_child" onclick="getjson('商品房上市供应情况表- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('商品房上市供应情况表- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('商品房上市供应情况表- ds1_月份')" >ds1_月份</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>商品房成交情况表</a>
+            </div>-->
+            <div id="main17" class="item" style="color:white" onclick="openItems('menu_title2',child17)" >
+              商品房成交情况表</div>
+            <div id="child17" style="display:none" >
+              <a href="TEST.php?id=ZJJGH_DEAL_RP" target='_blank'>ZJJGH_DEAL_RP</a><br>
+              <h class="item_child" onclick="getjson('商品房成交情况表- ds2')" >ds2</h><br>
+              <h class="item_child" onclick="getjson('商品房成交情况表- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('商品房成交情况表- ds1_月份')" >ds1_月份</h>
+            </div>
+            <li class="item_divider"></li>
+
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>商品住房不同套型供求结构表</a>
+            </div>-->
+            <div id="main18" class="item" style="color:white" onclick="openItems('menu_title2',child18)" >
+              商品住房不同套型供求结构表</div>
+            <div id="child18" style="display:none" >
+              <a href="TEST.php?id=ZJJGH_AREA_RANGE_RP" target='_blank'>ZJJGH_AREA_RANGE_RP</a><br>
+              <h class="item_child" onclick="getjson('商品住房不同套型供求结构表- ds3')" >ds3</h><br>
+              <h class="item_child" onclick="getjson('商品住房不同套型供求结构表- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('商品住房不同套型供求结构表- ds3_平均价')" >ds3_平均价</h><br>
+              <h class="item_child" onclick="getjson('商品住房不同套型供求结构表- ds1_月份')" >ds1_月份</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>商品住房不同价位供求结构表</a>
+            </div>-->
+            <div id="main19" class="item" style="color:white" onclick="openItems('menu_title2',child19)" >
+              商品住房不同价位供求结构表</div>
+            <div id="child19" style="display:none" >
+              <a href="TEST.php?id=ZJJGH_PRICE_RANGE_RP" target='_blank'>ZJJGH_PRICE_RANGE_RP</a><br>
+              <h class="item_child" onclick="getjson('商品住房不同价位供求结构表- ds4')" >ds4</h><br>
+              <h class="item_child" onclick="getjson('商品住房不同价位供求结构表- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('商品住房不同价位供求结构表- ds1_月份')" >ds1_月份</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>商品住房购买对象分类表</a>
+            </div>-->
+            <div id="main20" class="item" style="color:white" onclick="openItems('menu_title2',child20)" >
+              商品住房购买对象分类表</div>
+            <div id="child20" style="display:none" >
+              <a href="TEST.php?id=ZJJGH_BUYER_TYPE_RP" target='_blank'>ZJJGH_BUYER_TYPE_RP</a><br>
+              <h class="item_child" onclick="getjson('商品住房购买对象分类表- ds2')" >ds2</h><br>
+              <h class="item_child" onclick="getjson('商品住房购买对象分类表- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('商品住房购买对象分类表- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('商品住房购买对象分类表- ds1_月份')" >ds1_月份</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>二手房成交情况</a>
+            </div>-->
+            <div id="main21" class="item" style="color:white" onclick="openItems('menu_title2',child21)" >
+              二手房成交情况</div>
+            <div id="child21" style="display:none" >
+              <a href="TEST.php?id=ZJJGH_OLDHOS_DEAL_INFO" target='_blank'>ZJJGH_OLDHOS_DEAL_INFO</a><br>
+              <h class="item_child" onclick="getjson('二手房成交情况- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('二手房成交情况- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('二手房成交情况- ds1_月份')" >ds1_月份</h>
+            </div>
+            <li class="item_divider"></li>
+
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>月报</a>
+            </div>-->
+            <div id="main22" class="item" style="color:white" onclick="openItems('menu_title2',child22)" >
+              月报</div>
+            <div id="child22" style="display:none" >
+              <a href="TEST.php?id=ZJJGH_SUPPLY_SALE_RP" target='_blank'>ZJJGH_SUPPLY_SALE_RP</a><br>
+              <h class="item_child" onclick="getjson('月报- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('月报- ds_月份')" >ds_月份</h><br>
+              <h class="item_child" onclick="getjson('月报- ds_年份')" >ds_年份</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--
+            <div class="item">
+              <a href="TEST.php?id=" target='_blank'>系列报表导出</a>
+            </div>-->
+            <div id="main23" class="item" style="color:white" onclick="openItems('menu_title2',child23)" >
+              系列报表导出</div>
+            <div id="child23" style="display:none" >
+              <a href="TEST.php?id=ZJJGH_BUYER_TYPE_RP" target='_blank'>ZJJGH_BUYER_TYPE_RP</a><br>
+              <a href="TEST.php?id=ZJJGH_DEAL_RP" target='_blank'>ZJJGH_DEAL_RP</a><br>
+              <a href="TEST.php?id=ZJJGH_SUPPLY_STOCK_RP" target='_blank'>ZJJGH_SUPPLY_STOCK_RP</a><br>
+              <a href="TEST.php?id=ZJJGH_PRICE_RANGE_RP" target='_blank'>ZJJGH_PRICE_RANGE_RP</a><br>
+              <a href="TEST.php?id=ZJJGH_AREA_RANGE_RP" target='_blank'>ZJJGH_AREA_RANGE_RP</a><br>
+              <a href="TEST.php?id=ZJJGH_OLDHOS_DEAL_INFO" target='_blank'>ZJJGH_OLDHOS_DEAL_INFO</a><br>
+              <h class="item_child" onclick="getjson('系列报表导出- ds1_购买对象')" >ds1_购买对象</h><br>
+              <h class="item_child" onclick="getjson('系列报表导出- ds2')" >ds2</h><br>
+              <h class="item_child" onclick="getjson('系列报表导出- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('系列报表导出- ds4')" >ds4</h><br>
+              <h class="item_child" onclick="getjson('系列报表导出- ds3')" >ds3</h><br>
+              <h class="item_child" onclick="getjson('系列报表导出- ds2_购买对象')" >ds2_购买对象</h><br>
+              <h class="item_child" onclick="getjson('系列报表导出- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('系列报表导出- ds3_平均价')" >ds3_平均价</h><br>
+              <h class="item_child" onclick="getjson('系列报表导出- ds1_二手房成交')" >ds1_二手房成交</h><br>
+              <h class="item_child" onclick="getjson('系列报表导出- ds1_月份')" >ds1_月份</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>供应明细</a>
+            </div>-->
+            <div id="main24" class="item" style="color:white" onclick="openItems('menu_title2',child24)" >
+              供应明细</div>
+            <div id="child24" style="display:none" >
+              <a href="TEST.php?id=ZJJGH_FIX_ROOM_SUPPLY_DETAIL" target='_blank'>ZJJGH_FIX_ROOM_SUPPLY_DETAIL</a><br>
+              <a href="TEST.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF" target='_blank'>ADS_NEWHOS_SUPPLY_SALE_RP_MF</a><br>
+              <h class="item_child" onclick="getjson('供应明细- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('供应明细- ds2—区域')" >ds2—区域</h><br>
+              <h class="item_child" onclick="getjson('供应明细- ds2-项目名称')" >ds2-项目名称</h><br>
+              <h class="item_child" onclick="getjson('供应明细- ds2_板块')" >ds2_板块</h><br>
+              <h class="item_child" onclick="getjson('供应明细- ds2_开发公司')" >ds2_开发公司</h><br>
+              <h class="item_child" onclick="getjson('供应明细- ds2-是否包含')" >ds2-是否包含</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>成交明细</a>
+            </div>-->
+            <div id="main25" class="item" style="color:white" onclick="openItems('menu_title2',child25)" >
+              成交明细</div>
+            <div id="child25" style="display:none" >
+              <a href="TEST.php?id=NEWHOS_FIX_CONTRACT_DETAIL" target='_blank'>NEWHOS_FIX_CONTRACT_DETAIL</a><br>
+              <a href="TEST.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF" target='_blank'>ADS_NEWHOS_SUPPLY_SALE_RP_MF</a><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds2—区域')" >ds2—区域</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds2-项目名称')" >ds2-项目名称</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds2_板块')" >ds2_板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds2_开发公司')" >ds2_开发公司</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds2-是否包含')" >ds2-是否包含</h>
+            </div>
+            <li class="item_divider"></li>
+
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>库存明细</a>
+            </div>-->
+            <div id="main26" class="item" style="color:white" onclick="openItems('menu_title2',child26)" >
+              库存明细</div>
+            <div id="child26" style="display:none" >
+              <a href="TEST.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF" target='_blank'>ADS_NEWHOS_SUPPLY_SALE_RP_MF</a><br>
+              <a href="TEST.php?id=NEWHOS_FIX_ROOM_STOCK_DETAIL" target='_blank'>NEWHOS_FIX_ROOM_STOCK_DETAIL</a><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存明细- ds2—区域')" >ds2—区域</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存明细- ds2-项目名称')" >ds2-项目名称</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存明细- ds2_板块')" >ds2_板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存明细- ds2_开发公司')" >ds2_开发公司</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存明细- 库存明细')" >库存明细</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存明细- ds2_月份')" >ds2_月份</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-库存明细- ds2-是否包含')" >ds2-是否包含</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--
+            <div class="item">
+              <a href="TEST.php?id=" target='_blank'>存量房成交明细</a>
+            </div>-->
+            <div id="main27" class="item" style="color:white" onclick="openItems('menu_title2',child27)" >
+              存量房成交明细</div>
+            <div id="child27" style="display:none" >
+              <a href="TEST.php?id=ZJJGH_FIX_BDC_ROOM_DEAL_DETAIL" target='_blank'>ZJJGH_FIX_BDC_ROOM_DEAL_DETAIL</a><br>
+              <a href="TEST.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF" target='_blank'>ADS_NEWHOS_SUPPLY_SALE_RP_MF</a><br>
+              <h class="item_child" onclick="getjson('存量房成交明细- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('存量房成交明细- ds2—区域')" >ds2—区域</h><br>
+              <h class="item_child" onclick="getjson('存量房成交明细- ds2-项目名称')" >ds2-项目名称</h><br>
+              <h class="item_child" onclick="getjson('存量房成交明细- ds2_板块')" >ds2_板块</h><br>
+              <h class="item_child" onclick="getjson('存量房成交明细- ds2_开发公司')" >ds2_开发公司</h><br>
+              <h class="item_child" onclick="getjson('存量房成交明细- ds2-是否包含')" >ds2-是否包含</h>
+            </div>
+          </div>
+
+          <li class="menu_divider"></li>
+
+          <div id="menu_title3" class="menu_title" onclick="openMenu(this)">
+            存量房
+            <div class="indicator" id="indicator3">^</div>
+          </div>
+          <div class="menu" id="menu3">
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>二手房日报</a>
+            </div>-->
+            <div id="main28" class="item" style="color:white" onclick="openItems('menu_title3',child28)" >
+              二手房日报</div>
+            <div id="child28" style="display:none" >
+              <a href="TEST.php?id=ZJB_SPF_XF_JYTJB_SX" target='_blank'>ZJB_SPF_XF_JYTJB_SX</a><br>
+              <a href="TEST.php?id=ZJB_SPF_XF_JYTJB" target='_blank'>ZJB_SPF_XF_JYTJB</a><br>
+              <h class="item_child" onclick="getjson('二手房日报- ds_房屋用途')" >ds_房屋用途</h><br>
+              <h class="item_child" onclick="getjson('二手房日报- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('二手房日报- ds_区域')" >ds_区域</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>存量房-成交量</a>
+            </div>-->
+            <div id="main29" class="item" style="color:white" onclick="openItems('menu_title3',child29)" >
+              存量房-成交量</div>
+            <div id="child29" style="display:none" >
+              <a href="TEST.php?id=BDC_TRAN_ANALYSIS_VOLUME" target='_blank'>BDC_TRAN_ANALYSIS_VOLUME</a><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds1_成交总量')" >ds1_成交总量</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds2_成交走势')" >ds2_成交走势</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds3_性质细分')" >ds3_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds3_成交占比')" >ds3_成交占比</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds3_区域，用途，房屋性质，装修情况')" >ds3_区域，用途，房屋性质，装修情况</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds3_用途细分')" >ds3_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds1_区域,用途,房屋性质,装修情况')" >ds1_区域,用途,房屋性质,装修情况</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>存量房-成交价格-价格总量</a>
+            </div>-->
+            <div id="main30" class="item" style="color:white" onclick="openItems('menu_title3',child30)" >
+              存量房-成交价格-价格总量</div>
+            <div id="child30" style="display:none" >
+              <a href="TEST.php?id=BDC_TRAN_ANALYSIS_VOLUME" target='_blank'>BDC_TRAN_ANALYSIS_VOLUME</a><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds1_成交总量')" >ds1_成交总量</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds2_成交走势')" >ds2_成交走势</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds3_性质细分')" >ds3_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds3_成交占比')" >ds3_成交占比</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds3_区域，用途，房屋性质，装修情况')" >ds3_区域，用途，房屋性质，装修情况</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds3_用途细分')" >ds3_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交量- ds1_区域,用途,房屋性质,装修情况')" >ds1_区域,用途,房屋性质,装修情况</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>存量房-成交价格-价格走势</a>
+            </div>-->
+            <div id="main31" class="item" style="color:white" onclick="openItems('menu_title3',child31)" >
+              存量房-成交价格-价格走势</div>
+            <div id="child31" style="display:none" >
+              <a href="TEST.php?id=BDC_TRAN_ANALYSIS_PRICE" target='_blank'>BDC_TRAN_ANALYSIS_PRICE</a><br>
+              <h class="item_child" onclick="getjson('存量房-成交价格-价格走势- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交价格-价格走势- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交价格-价格走势- ds2_价格走势_价格段走势')" >ds2_价格走势_价格段走势</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交价格-价格走势- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交价格-价格走势- ds2_价格走势_价格走势')" >ds2_价格走势_价格走势</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交价格-价格走势- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交价格-价格走势- ds1_区域,用途,房屋性质,装修情况')" >ds1_区域,用途,房屋性质,装修情况</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>存量房-成交结构</a>
+            </div>-->
+            <div id="main32" class="item" style="color:white" onclick="openItems('menu_title3',child32)" >
+              存量房-成交结构</div>
+            <div id="child32" style="display:none" >
+              <a href="TEST.php?id=BDC_TRAN_ANALYSIS_PRICE" target='_blank'>BDC_TRAN_ANALYSIS_PRICE</a><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds3_所属板块')" >ds3_所属板块</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds2_单价位段结构')" >ds2_单价位段结构</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds2_区域，用途，房屋性质，装修情况')" >ds2_区域，用途，房屋性质，装修情况</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds2_总价位段结构')" >ds2_总价位段结构</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds3_性质细分')" >ds3_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds3_区域，用途，房屋性质，装修情况')" >ds3_区域，用途，房屋性质，装修情况</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds3_用途细分')" >ds3_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds3_总价位段趋势图')" >ds3_总价位段趋势图</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds3_单价位段趋势图')" >ds3_单价位段趋势图</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds1_区域,用途,房屋性质,装修情况')" >ds1_区域,用途,房屋性质,装修情况</h><br>
+              <h class="item_child" onclick="getjson('存量房-成交结构- ds1_面积段结构')" >ds1_面积段结构</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>存量房-一二手房对比</a>
+            </div>-->
+            <div id="main33" class="item" style="color:white" onclick="openItems('menu_title3',child33)" >
+              存量房-一二手房对比</div>
+            <div id="child33" style="display:none" >
+              <a href="TEST.php?id=BDC_CONTRAST_AREA_RANGE" target='_blank'>BDC_CONTRAST_AREA_RANGE</a><br>
+              <a href="TEST.php?id=BDC_CONTRAST_TREND" target='_blank'>BDC_CONTRAST_TREND</a><br>
+              <a href="TEST.php?id=BDC_CONTRAST_TOTAL_PRICE_RANGE" target='_blank'>BDC_CONTRAST_TOTAL_PRICE_RANGE</a><br>
+              <h class="item_child" onclick="getjson('存量房-一二手房对比- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-一二手房对比- ds2_区域,用途,房屋性质,装修情况')" >ds2_区域,用途,房屋性质,装修情况</h><br>
+              <h class="item_child" onclick="getjson('存量房-一二手房对比- ds2_tab1_比值')" >ds2_tab1_比值</h><br>
+              <h class="item_child" onclick="getjson('存量房-一二手房对比- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-一二手房对比- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('存量房-一二手房对比- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-一二手房对比- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('存量房-一二手房对比- ds2_年份')" >ds2_年份</h><br>
+              <h class="item_child" onclick="getjson('存量房-一二手房对比- ds1_区域')" >ds1_区域</h><br>
+              <h class="item_child" onclick="getjson('存量房-一二手房对比- ds1_单价段')" >ds1_单价段</h><br>
+              <h class="item_child" onclick="getjson('存量房-一二手房对比- ds1_面积段')" >ds1_面积段</h><br>
+              <h class="item_child" onclick="getjson('存量房-一二手房对比- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('存量房-一二手房对比- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-一二手房对比- ds2_tab1')" >ds2_tab1</h><br>
+              <h class="item_child" onclick="getjson('存量房-一二手房对比- ds1_区域,用途,房屋性质,装修情况')" >ds1_区域,用途,房屋性质,装修情况</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>存量房-区域结构</a>
+            </div>-->
+            <div id="main34" class="item" style="color:white" onclick="openItems('menu_title3',child34)" >
+              存量房-区域结构</div>
+            <div id="child34" style="display:none" >
+              <a href="TEST.php?id=BDC_TRAN_ANALYSIS_VOLUME" target='_blank'>BDC_TRAN_ANALYSIS_VOLUME</a><br>
+              <a href="TEST.php?id=BDC_TRAN_STRUCT_AREA_RANGE" target='_blank'>BDC_TRAN_STRUCT_AREA_RANGE</a><br>
+              <h class="item_child" onclick="getjson('存量房-区域结构- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-区域结构- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('存量房-区域结构- ds2_区域,用途,房屋性质,装修情况')" >ds2_区域,用途,房屋性质,装修情况</h><br>
+              <h class="item_child" onclick="getjson('存量房-区域结构- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-区域结构- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('存量房-区域结构- ds2_面积段')" >ds2_面积段</h><br>
+              <h class="item_child" onclick="getjson('存量房-区域结构- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-区域结构- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('存量房-区域结构- ds2_年份')" >ds2_年份</h><br>
+              <h class="item_child" onclick="getjson('存量房-区域结构- ds2_价格段')" >ds2_价格段</h><br>
+              <h class="item_child" onclick="getjson('存量房-区域结构- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('存量房-区域结构- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-区域结构- ds1_区域,用途,房屋性质,装修情况')" >ds1_区域,用途,房屋性质,装修情况</h>
+            </div>
+            <li class="item_divider"></li>
+
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>存量房-购房者结构</a>
+            </div>-->
+            <div id="main35" class="item" style="color:white" onclick="openItems('menu_title3',child35)" >
+              存量房-购房者结构</div>
+            <div id="child35" style="display:none" >
+              <a href="TEST.php?id=BDC_OTHER_STRUCT_ZYCS" target='_blank'>BDC_OTHER_STRUCT_ZYCS</a><br>
+              <a href="TEST.php?id=BDC_OTHER_STRUCT_AGE_HX" target='_blank'>BDC_OTHER_STRUCT_AGE_HX</a><br>
+              <a href="TEST.php?id=BDC_AREA_STRUCT_REGION" target='_blank'>BDC_AREA_STRUCT_REGION</a><br>
+              <a href="TEST.php?id=BDC_AREA_STRUCT_HUJI" target='_blank'>BDC_AREA_STRUCT_HUJI</a><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_置业一次')" >ds2_置业一次</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds3_所属板块')" >ds3_所属板块</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds3_性质细分')" >ds3_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_区域，用途，房屋性质，装修')" >ds2_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_年份排序')" >ds2_年份排序</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_置业三次以上')" >ds2_置业三次以上</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds3_其他购房者特征_户型_同比')" >ds3_其他购房者特征_户型_同比</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_置业套数占比')" >ds2_置业套数占比</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds3_用途细分')" >ds3_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds3_户型特征')" >ds3_户型特征</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds3_年龄占比_趋势')" >ds3_年龄占比_趋势</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds1_外省户籍在长购房top10')" >ds1_外省户籍在长购房top10</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds1_户籍类型详细_表格')" >ds1_户籍类型详细_表格</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_置业次数占比')" >ds2_置业次数占比</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds3_其他购房者特征趋势_年龄段_同比')" >ds3_其他购房者特征趋势_年龄段_同比</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds3_户型占比_趋势')" >ds3_户型占比_趋势</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds3_年份排序')" >ds3_年份排序</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds1_户籍购房者占比走势')" >ds1_户籍购房者占比走势</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds3_年龄特征')" >ds3_年龄特征</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_置业总套数')" >ds2_置业总套数</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds3_区域，用途，房屋性质，装修')" >ds3_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_置业次数占比走势')" >ds2_置业次数占比走势</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_置业一套')" >ds2_置业一套</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_置业三套以上')" >ds2_置业三套以上</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_置业二次')" >ds2_置业二次</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_置业套数占比走势')" >ds2_置业套数占比走势</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds2_置业二套')" >ds2_置业二套</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds1_户籍总数_表格')" >ds1_户籍总数_表格</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds1_本省其他地市在长购房排名')" >ds1_本省其他地市在长购房排名</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds1_年份排序')" >ds1_年份排序</h><br>
+              <h class="item_child" onclick="getjson('存量房-购房者结构- ds1_区域，用途，房屋性质，装修情况')" >ds1_区域，用途，房屋性质，装修情况</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>成交明细</a>
+            </div>-->
+            <div id="main36" class="item" style="color:white" onclick="openItems('menu_title3',child36)" >
+              成交明细</div>
+            <div id="child36" style="display:none" >
+              <a href="TEST.php?id=NEWHOS_FIX_CONTRACT_DETAIL" target='_blank'>NEWHOS_FIX_CONTRACT_DETAIL</a><br>
+              <a href="TEST.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF" target='_blank'>ADS_NEWHOS_SUPPLY_SALE_RP_MF</a><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds2—区域')" >ds2—区域</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds2-项目名称')" >ds2-项目名称</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds2_板块')" >ds2_板块</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds2_开发公司')" >ds2_开发公司</h><br>
+              <h class="item_child" onclick="getjson('新建商品房-成交明细- ds2-是否包含')" >ds2-是否包含</h>
+            </div>
+
+          </div>
+
+          <li class="menu_divider"></li>
+
+          <div id="menu_title4" class="menu_title" onclick="openMenu(this)">
+            动态查询
+            <div class="indicator" id="indicator4">^</div>
+          </div>
+          <div class="menu" id="menu4">
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>二手房日报</a>
+            </div>-->
+            <div id="main37" class="item" style="color:white" onclick="openItems('menu_title4',child37)" >
+              供销报表</div>
+            <div id="child37" style="display:none" >
+              <a href="TEST.php?id=NEWHOS_DT_SUPPLY_SALE_RP" target='_blank'>NEWHOS_DT_SUPPLY_SALE_RP</a><br>
+              <h class="item_child" onclick="getjson('供销报表- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('供销报表- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('供销报表- ds1_供销总量')" >ds1_供销总量</h><br>
+              <h class="item_child" onclick="getjson('供销报表- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('供销报表- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('供销报表- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('供销报表- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('供销报表- ds1_区域,用途,房屋性质,装修情况')" >ds1_区域,用途,房屋性质,装修情况</h><br>
+              <h class="item_child" onclick="getjson('供销报表- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('供销报表- ds2_供销走势')" >ds2_供销走势</h>
+            </div>
+            <li class="item_divider"></li>
+
+            <div id="main38" class="item" style="color:white" onclick="openItems('menu_title4',child38)" >
+              价格报表-价格总量</div>
+            <div id="child38" style="display:none" >
+              <a href="TEST.php?id=NEWHOS_DT_PRICE_RP" target='_blank'>NEWHOS_DT_PRICE_RP</a><br>
+              <a href="TEST.php?id=NEWHOS_DT_PRICE_INFO" target='_blank'>NEWHOS_DT_PRICE_INFO</a><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_价格总量_面积段')" >ds1_价格总量_面积段</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_价格总量_中位数')" >ds1_价格总量_中位数</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_价格总量_价格')" >ds1_价格总量_价格</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_区域,用途,房屋性质,装修情况')" >ds1_区域,用途,房屋性质,装修情况</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格走势- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格走势- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格走势- ds2_价格走势_价格段走势')" >ds2_价格走势_价格段走势</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格走势- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格走势- ds2_价格走势_价格走势')" >ds2_价格走势_价格走势</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格走势- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格走势- ds1_区域,用途,房屋性质,装修情况')" >ds1_区域,用途,房屋性质,装修情况</h>
+            </div>
+            <li class="item_divider"></li>
+
+            <div id="main39" class="item" style="color:white" onclick="openItems('menu_title4',child39)" >
+              价格报表-价格走势</div>
+            <div id="child39" style="display:none" >
+              <a href="TEST.php?id=NEWHOS_DT_PRICE_RP" target='_blank'>NEWHOS_DT_PRICE_RP</a><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_价格总量_面积段')" >ds1_价格总量_面积段</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_价格总量_中位数')" >ds1_价格总量_中位数</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_价格总量_价格')" >ds1_价格总量_价格</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_区域,用途,房屋性质,装修情况')" >ds1_区域,用途,房屋性质,装修情况</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格总量- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格走势- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格走势- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格走势- ds2_价格走势_价格段走势')" >ds2_价格走势_价格段走势</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格走势- ds1_年份')" >ds1_年份</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格走势- ds2_价格走势_价格走势')" >ds2_价格走势_价格走势</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格走势- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('价格报表-价格走势- ds1_区域,用途,房屋性质,装修情况')" >ds1_区域,用途,房屋性质,装修情况</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>存量房-成交价格-价格走势</a>
+            </div>-->
+            <div id="main40" class="item" style="color:white" onclick="openItems('menu_title4',child40)" >
+              供销结构报表</div>
+            <div id="child40" style="display:none" >
+              <a href="TEST.php?id=NEWHOS_DT_SUPPLY_SALE_STRUC_RP" target='_blank'>NEWHOS_DT_SUPPLY_SALE_STRUC_RP</a><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds3_所属板块')" >ds3_所属板块</h><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds3_性质细分')" >ds3_性质细分</h><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds2_成交价位段结构_总价段')" >ds2_成交价位段结构_总价段</h><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds2_成交价位段结构_单价段')" >ds2_成交价位段结构_单价段</h><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds1_年份升序')" >ds1_年份升序</h><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds3_价位段占比_单价段')" >ds3_价位段占比_单价段</h><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds3_用途细分')" >ds3_用途细分</h><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds1_供销结构')" >ds1_供销结构</h><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds3_价位段占比_总价段')" >ds3_价位段占比_总价段</h><br>
+              <h class="item_child" onclick="getjson('供销结构报表- ds1_区域,用途,房屋性质,装修情况')" >ds1_区域,用途,房屋性质,装修情况</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>存量房-成交结构</a>
+            </div>-->
+            <div id="main41" class="item" style="color:white" onclick="openItems('menu_title4',child41)" >
+              区域结构</div>
+            <div id="child41" style="display:none" >
+              <a href="TEST.php?id=NEWHOS_DT_REGION_STRUC_RATIO" target='_blank'>NEWHOS_DT_REGION_STRUC_RATIO</a><br>
+              <a href="TEST.php?id=NEWHOS_DT_REGION_STRUC_RP" target='_blank'>NEWHOS_DT_REGION_STRUC_RP</a><br>
+              <a href="TEST.php?id=NEWHOS_DT_REGION_STRUC_RANK_RP" target='_blank'>NEWHOS_DT_REGION_STRUC_RANK_RP</a><br>
+              <h class="item_child" onclick="getjson('区域结构- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds2_区域，用途，房屋性质，装修')" >ds2_ 区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds3_项目交易情况')" >ds3_项目交易情况</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds3_所属板块')" >ds3_所属板块</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds2_区域成交段位特征_单价段')" >ds2_区域成交段位特征_单价段</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds3_性质细分')" >ds3_性质细分</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds2_区域成交段位特征_面积段')" >ds2_区域成交段位特征_面积段</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds3_区域，用途，房屋性质，装修')" >ds3_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds3_项目名称')" >ds3_项目名称</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds1_区域，用途，房屋性质，装修')" >ds1_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds1_区域占比')" >ds1_区域占比</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds3_用途细分')" >ds3_用途细分</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('区域结构- ds1_年份排序')" >ds1_年份排序</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>存量房-一二手房对比</a>
+            </div>-->
+            <div id="main42" class="item" style="color:white" onclick="openItems('menu_title4',child42)" >
+              购房者特征(限购区)</div>
+            <div id="child42" style="display:none" >
+              <a href="TEST.php?id=NEWHOS_DT_XGQ_BUYER_STRUC_HPG" target='_blank'>NEWHOS_DT_XGQ_BUYER_STRUC_HPG</a><br>
+              <a href="TEST.php?id=NEWHOS_DT_XGQ_BUYER_STRUC_QT" target='_blank'>NEWHOS_DT_XGQ_BUYER_STRUC_QT</a><br>
+              <a href="TEST.php?id=NEWHOS_DT_XGQ_BUYER_STRUC_RPR" target='_blank'>NEWHOS_DT_XGQ_BUYER_STRUC_RPR</a><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_置业一次')" >ds2_置业一次</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds3_所属板块')" >ds3_所属板块</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds3_户型_趋势')" >ds3_户型_趋势</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds3_其他购房者特征_贷款方式')" >ds3_其他购房者特征_贷款方式</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds3_性质细分')" >ds3_性质细分</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds3_贷款方式_趋势')" >ds3_贷款方式_趋势</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_区域，用途，房屋性质，装修')" >ds2_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds3_其他购房者特征情况_同比')" >ds3_其他购房者特征情况_同比</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_年份排序')" >ds2_年份排序</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_置业三次以上')" >ds2_置业三次以上</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds3_其他购房者特征_户型_同比')" >ds3_其他购房者特征_户型_同比</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_置业套数占比')" >ds2_置业套数占比</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds3_用途细分')" >ds3_用途细分</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds3_户型特征')" >ds3_户型特征</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds3_年龄占比_趋势')" >ds3_年龄占比_趋势</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds1_外省户籍在长购房top10')" >ds1_外省户籍在长购房top10</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds1_户籍类型详细_表格')" >ds1_户籍类型详细_表格</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_置业次数占比')" >ds2_置业次数占比</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds3_其他购房者特征趋势_年龄段_同比')" >ds3_其他购房者特征趋势_年龄段_同比</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds3_年份排序')" >ds3_年份排序</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds1_户籍购房者占比走势')" >ds1_户籍购房者占比走势</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds3_年龄特征')" >ds3_年龄特征</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_置业总套数')" >ds2_置业总套数</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds3_区域，用途，房屋性质，装修')" >ds3_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_置业一套')" >ds2_置业一套</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_置业三套以上')" >ds2_置业三套以上</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_置业二次')" >ds2_置业二次</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_置业套数走势')" >ds2_置业套数走势</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_置业二套')" >ds2_置业二套</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds1_户籍总数_表格')" >ds1_户籍总数_表格</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds2_置业次数走势')" >ds2_置业次数走势</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds1_本省其他地市在长购房排名')" >ds1_本省其他地市在长购房排名</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds1_年份排序')" >ds1_年份排序</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(限购区)- ds1_区域，用途，房屋性质，装修情况')" >ds1_区域，用途，房屋性质，装修情况</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>存量房-区域结构</a>
+            </div>-->
+            <div id="main43" class="item" style="color:white" onclick="openItems('menu_title4',child43)" >
+              购房者特征(全市)</div>
+            <div id="child43" style="display:none" >
+              <a href="TEST.php?id=NEWHOS_DT_BUYER_STRUC_HPG_RP" target='_blank'>NEWHOS_DT_BUYER_STRUC_HPG_RP</a><br>
+              <a href="TEST.php?id=NEWHOS_DT_BUYER_STRUC_OTHER_RP" target='_blank'>NEWHOS_DT_BUYER_STRUC_OTHER_RP</a><br>
+              <a href="TEST.php?id=NEWHOS_DT_BUYER_STRUC_RPR_RP" target='_blank'>NEWHOS_DT_BUYER_STRUC_RPR_RP</a><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_置业一次')" >ds2_置业一次</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds3_所属板块')" >ds3_所属板块</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds3_户型_趋势')" >ds3_户型_趋势</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds3_其他购房者特征_贷款方式')" >ds3_其他购房者特征_贷款方式</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds3_性质细分')" >ds3_性质细分</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds3_贷款方式_趋势')" >ds3_贷款方式_趋势</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_区域，用途，房屋性质，装修')" >ds2_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds3_其他购房者特征情况_同比')" >ds3_其他购房者特征情况_同比</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_年份排序')" >ds2_年份排序</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_置业三次以上')" >ds2_置业三次以上</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds3_其他购房者特征_户型_同比')" >ds3_其他购房者特征_户型_同比</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_置业套数占比')" >ds2_置业套数占比</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds3_用途细分')" >ds3_用途细分</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds3_户型特征')" >ds3_户型特征</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds3_年龄占比_趋势')" >ds3_年龄占比_趋势</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds1_外省户籍在长购房top10')" >ds1_外省户籍在长购房top10</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds1_户籍类型详细_表格')" >ds1_户籍类型详细_表格</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_置业次数占比')" >ds2_置业次数占比</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds3_其他购房者特征趋势_年龄段_同比')" >ds3_其他购房者特征趋势_年龄段_同比</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds3_年份排序')" >ds3_年份排序</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds1_户籍购房者占比走势')" >ds1_户籍购房者占比走势</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds3_年龄特征')" >ds3_年龄特征</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_置业总套数')" >ds2_置业总套数</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds3_区域，用途，房屋性质，装修')" >ds3_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_置业一套')" >ds2_置业一套</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_置业三套以上')" >ds2_置业三套以上</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_置业二次')" >ds2_置业二次</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_置业套数走势')" >ds2_置业套数走势</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_置业二套')" >ds2_置业二套</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds1_户籍总数_表格')" >ds1_户籍总数_表格</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds2_置业次数走势')" >ds2_置业次数走势</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds1_本省其他地市在长购房排名')" >ds1_本省其他地市在长购房排名</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds1_年份排序')" >ds1_年份排序</h><br>
+              <h class="item_child" onclick="getjson('购房者特征(全市)- ds1_区域，用途，房屋性质，装修情况')" >ds1_区域，用途，房屋性质，装修情况</h>
+            </div>
+            <li class="item_divider"></li>
+
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>存量房-购房者结构</a>
+            </div>-->
+            <div id="main44" class="item" style="color:white" onclick="openItems('menu_title4',child44)" >
+              年度报表</div>
+            <div id="child44" style="display:none" >
+              <a href="TEST.php?id=NEWHOS_DT_YEAR_SUM_RP" target='_blank'>NEWHOS_DT_YEAR_SUM_RP</a><br>
+              <a href="TEST.php?id=NEWHOS_DT_YEAR_TREND_RP" target='_blank'>NEWHOS_DT_YEAR_TREND_RP</a><br>
+              <a href="TEST.php?id=NEWHOS_DT_YEAR_TREND_RATIO_RP" target='_blank'>NEWHOS_DT_YEAR_TREND_RATIO_RP</a><br>
+              <h class="item_child" onclick="getjson('年度报表- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds1_年限（供应面积，供应套数）')" >ds1_年限（供应面积，供应套数）</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds2_年度趋势图')" >ds2_年度趋势图</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds3_年度占比趋势变化_面积段')" >ds3_年度占比趋势变化_面积段</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds3_所属板块')" >ds3_所属板块</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds3_性质细分')" >ds3_性质细分</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds3_年度占比趋势变化_总价段')" >ds3_年度占比趋势变化_总价段</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds3_年份排序')" >ds3_年份排序</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds2_区域，用途，房屋性质，装修')" >ds2_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds1_年份降序')" >ds1_年份降序</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds3_年度占比趋势变化_购房者结构')" >ds3_年度占比趋势变化_购房者结构</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds3_区域，用途，房屋性质，装修')" >ds3_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds1_性质细分')" >ds1_性质细分</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds1_区域，用途，房屋性质，装修')" >ds1_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds2_所属板块')" >ds2_所属板块</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds1_面积，套数')" >ds1_面积，套数</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds3_用途细分')" >ds3_用途细分</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds1_面积段')" >ds1_面积段</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('年度报表- ds3_年度占比趋势变化_单价段')" >ds3_年度占比趋势变化_单价段</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>成交明细</a>
+            </div>-->
+            <div id="main45" class="item" style="color:white" onclick="openItems('menu_title4',child45)" >
+              库存结构</div>
+            <div id="child45" style="display:none" >
+              <a href="TEST.php?id=NEWHOS_DT_YEAR_SUM_RP" target='_blank'>NEWHOS_DT_YEAR_SUM_RP</a><br>
+              <h class="item_child" onclick="getjson('库存结构- ds1_库存面积段')" >ds1_库存面积段</h><br>
+              <h class="item_child" onclick="getjson('库存结构- ds1_区域，用途，房屋性质，装修')" >ds1_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('库存结构- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('库存结构- ds2_年份排序')" >ds2_年份排序</h><br>
+              <h class="item_child" onclick="getjson('库存结构- ds1_库存年限')" >ds1_库存年限</h><br>
+              <h class="item_child" onclick="getjson('库存结构- ds2_用途细分')" >ds2_用途细分</h><br>
+              <h class="item_child" onclick="getjson('库存结构- ds1_ 库存总量结构')" >ds1_ 库存总量结构</h><br>
+              <h class="item_child" onclick="getjson('库存结构- ds2_库存面积走势')" >ds2_库存面积走势</h><br>
+              <h class="item_child" onclick="getjson('库存结构- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('库存结构- ds2_性质细分')" >ds2_性质细分</h><br>
+              <h class="item_child" onclick="getjson('库存结构- ds1_性质细分')" >ds1_性质细分</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>成交明细</a>
+            </div>-->
+            <div id="main47" class="item" style="color:white" onclick="openItems('menu_title4',child47)" >
+              契税结构</div>
+            <div id="child47" style="display:none" >
+              <a href="TEST.php?id=NEWHOS_DT_DEED_TAX_STRUC_RP" target='_blank'>NEWHOS_DT_DEED_TAX_STRUC_RP</a><br>
+              <h class="item_child" onclick="getjson('契税结构- ds1_区域，用途，房屋性质，装修')" >ds1_区域，用途，房屋性质，装修</h><br>
+              <h class="item_child" onclick="getjson('契税结构- ds1_用途细分')" >ds1_用途细分</h><br>
+              <h class="item_child" onclick="getjson('契税结构- ds1_完税情况')" >ds1_完税情况</h><br>
+              <h class="item_child" onclick="getjson('契税结构- ds1_所属板块')" >ds1_所属板块</h><br>
+              <h class="item_child" onclick="getjson('契税结构- ds1_年份排序')" >ds1_年份排序</h><br>
+              <h class="item_child" onclick="getjson('契税结构- ds1_性质细分')" >ds1_性质细分</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>成交明细</a>
+            </div>-->
+            <div id="main48" class="item" style="color:white" onclick="openItems('menu_title4',child48)" >
+              供应明细</div>
+            <div id="child48" style="display:none" >
+              <a href="TEST.php?id=ZJJGH_FIX_ROOM_SUPPLY_DETAIL" target='_blank'>ZJJGH_FIX_ROOM_SUPPLY_DETAIL</a><br>
+              <a href="TEST.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF" target='_blank'>ADS_NEWHOS_SUPPLY_SALE_RP_MF</a><br>
+              <h class="item_child" onclick="getjson('供应明细- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('供应明细- ds2—区域')" >ds2—区域</h><br>
+              <h class="item_child" onclick="getjson('供应明细- ds2-项目名称')" >ds2-项目名称</h><br>
+              <h class="item_child" onclick="getjson('供应明细- ds2_板块')" >ds2_板块</h><br>
+              <h class="item_child" onclick="getjson('供应明细- ds2_开发公司')" >ds2_开发公司</h><br>
+              <h class="item_child" onclick="getjson('供应明细- ds2-是否包含')" >ds2-是否包含</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>成交明细</a>
+            </div>-->
+            <div id="main49" class="item" style="color:white" onclick="openItems('menu_title4',child49)" >
+              成交明细</div>
+            <div id="child49" style="display:none" >
+              <a href="TEST.php?id=ZJJGH_FIX_CONTRACT_DETAIL" target='_blank'>ZJJGH_FIX_CONTRACT_DETAIL</a><br>
+              <a href="TEST.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF" target='_blank'>ADS_NEWHOS_SUPPLY_SALE_RP_MF</a><br>
+              <h class="item_child" onclick="getjson('成交明细- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('成交明细- ds2—区域')" >ds2—区域</h><br>
+              <h class="item_child" onclick="getjson('成交明细- ds2-项目名称')" >ds2-项目名称</h><br>
+              <h class="item_child" onclick="getjson('成交明细- ds2_板块')" >ds2_板块</h><br>
+              <h class="item_child" onclick="getjson('成交明细- ds2_开发公司')" >ds2_开发公司</h><br>
+              <h class="item_child" onclick="getjson('成交明细- ds2-是否包含')" >ds2-是否包含</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>成交明细</a>
+            </div>-->
+            <div id="main50" class="item" style="color:white" onclick="openItems('menu_title4',child50)" >
+              库存明细</div>
+            <div id="child50" style="display:none" >
+              <a href="TEST.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF" target='_blank'>ADS_NEWHOS_SUPPLY_SALE_RP_MF</a><br>
+              <a href="TEST.php?id=ZJJGH_FIX_ROOM_STOCK_DETAIL" target='_blank'>ZJJGH_FIX_ROOM_STOCK_DETAIL</a><br>
+              <h class="item_child" onclick="getjson('库存明细- ds2—区域')" >ds2—区域</h><br>
+              <h class="item_child" onclick="getjson('库存明细- ds2-项目名称')" >ds2-项目名称</h><br>
+              <h class="item_child" onclick="getjson('库存明细- ds2_板块')" >ds2_板块</h><br>
+              <h class="item_child" onclick="getjson('库存明细- ds2_开发公司')" >ds2_开发公司</h><br>
+              <h class="item_child" onclick="getjson('库存明细- 库存明细')" >库存明细</h><br>
+              <h class="item_child" onclick="getjson('库存明细- ds2_月份')" >ds2_月份</h><br>
+              <h class="item_child" onclick="getjson('库存明细- ds2-是否包含')" >ds2-是否包含</h>
+            </div>
+            <li class="item_divider"></li>
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>成交明细</a>
+            </div>-->
+            <div id="main51" class="item" style="color:white" onclick="openItems('menu_title4',child51)" >
+              契税明细</div>
+            <div id="child51" style="display:none" >
+              <a href="TEST.php?id=NEWHOS_DT_DEED_TAX_INFO" target='_blank'>NEWHOS_DT_DEED_TAX_INFO</a><br>
+              <a href="TEST.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF" target='_blank'>ADS_NEWHOS_SUPPLY_SALE_RP_MF</a><br>
+              <h class="item_child" onclick="getjson('契税明细- ds2_是否包含')" >ds2_是否包含</h><br>
+              <h class="item_child" onclick="getjson('契税明细- ds1')" >ds1</h><br>
+              <h class="item_child" onclick="getjson('契税明细- ds2_项目名称')" >ds2_项目名称</h><br>
+              <h class="item_child" onclick="getjson('契税明细- ds2_板块')" >ds2_板块</h><br>
+              <h class="item_child" onclick="getjson('契税明细- ds2_开发公司')" >ds2_开发公司</h><br>
+              <h class="item_child" onclick="getjson('契税明细- ds2_区域')" >ds2_区域</h>
+            </div>
+
+          </div>
+
+          <li class="menu_divider"></li>
+
+          <div id="menu_title5" class="menu_title" onclick="openMenu(this)">
+            新建报表
+            <div class="indicator" id="indicator5">^</div>
+          </div>
+          <div class="menu" id="menu5">
+            <!--<div class="item">
+              <a href="TEST.php?id=" target='_blank'>二手房日报</a>
+            </div>-->
+            <div id="main" class="item" style="color:white" onclick="openItems('menu_title5',child52)" >
+              二手房日报</div>
+            <div id="child52" style="display:none" >
+              <a href="TEST.php?id=bm" target='_blank'>bm</a><br>
+              <h class="item_child" onclick="getjson('机构统计报表- 机构数据统计')" >机构数据统计</h><br>
+
+            </div>
+            <li class="item_divider"></li>
+
+
+
+          </div>
+        </div>
+      </th>
+      <th>
+        <pre>
+          <div id="content" class="right">
+
+          </div>
+        </pre>
+      </th>
+    </tr>
+
+  </table>
+
+
+</div>
+</body>
+</html>
