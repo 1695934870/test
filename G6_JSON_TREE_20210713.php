@@ -40,7 +40,7 @@ class test{
 
         #$html='';
         $arr = array();
-        $sql = "SELECT source_table_task FROM test.sjzt_tree WHERE target  _table_task ='$pid'";
+        $sql = "SELECT source_table_task FROM test.sjzt_tree WHERE target_table_task ='$pid'";
         $result=mysqli_query($con,$sql);
         $data = mysqli_fetch_all($result,MYSQLI_ASSOC);
         foreach($data as $row)

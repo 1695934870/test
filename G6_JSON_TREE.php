@@ -26,7 +26,7 @@ class test{
 
 
         #$arr_json = array("deep"=>"0","id"=>"$code");
-        $arr_json = array("name"=>"$code","deep"=>"1");
+        $arr_json = array("name"=>"$code","deep"=>"1","parent_id"=>"Null");
         //$arr_json = array();
         $arr_json['children'] = $this->getTree("$code",$con,2);
         $jsonstr = json_encode($arr_json); // 转换成json数据存储格式
@@ -48,7 +48,7 @@ class test{
         {
             $code = $row['source_table'];
             #$tmp_arr = array("deep"=>"$deep","id"=>"$code","children"=>$this->getTree($row['source_table'],$con,$deep+1));
-            $tmp_arr = array("name"=>"$code","deep"=>"$deep","children"=>$this->getTree($row['source_table'],$con,$deep+1));
+            $tmp_arr = array("name"=>"$code","deep"=>"$deep","parent_id"=>"$pid","children"=>$this->getTree($row['source_table'],$con,$deep+1));
             array_push($arr,$tmp_arr);
         }
         return $arr;

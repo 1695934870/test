@@ -5,7 +5,8 @@
   <title>测试 ECharts</title>
   <!-- 引入 echarts.js -->
   <script src="https://cdn.staticfile.org/echarts/5.1.0/echarts.min.js"></script>
-  <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+  <!--<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>-->
+  <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
   <style>
     *{padding: 0;margin: 0;}
     .menu{
@@ -101,8 +102,8 @@
   $.ajax({
     cache: false,
     type: "GET",//重要参数1：请求的方式
-    //url : "G6_JSON_TREE.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF",//重要参数2：请求的文件名
-    url :UrlParam.paramValues("type")==1? "G6_JSON_TREE_20210713.php?id="+UrlParam.paramValues("target")+"":"G6_JSON_TREE.php?id="+UrlParam.paramValues("target")+"",
+    url : "G6_JSON_TREE.php?id=ADS_NEWHOS_SUPPLY_SALE_RP_MF",//重要参数2：请求的文件名
+    //url :UrlParam.paramValues("type")==1? "G6_JSON_TREE_20210713.php?id="+UrlParam.paramValues("target")+"":"G6_JSON_TREE.php?id="+UrlParam.paramValues("target")+"",
     var: "",
     //请求成功执行的function
     success: function(msg){//重要参数3：msg是后台返回的数据，和js的reponsetext一样，如果后台没有返回数据则不会弹出。
@@ -184,13 +185,11 @@
           return '<span style="position: relative;top: -10px;padding:0 5px;">'+ params.data.name+'</span>';
           // return firstParams.name + '  ' + firstParams.seriesName + '<br>' + '装机：' + firstParams.data + ' 亿千瓦<br>增长率：' + sndParams.data +' %';
         }  if (deviceType === 'switch'){
-          return '<span style="position: relative;top: -10px;padding: 0 5px;">节点名：'+ params.data.name+'</span>'+ '<br>'
-                  + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">层数：'+ params.data.deep+'</span>'+ '<br>'
-                  + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">父节点：'+ params.data.parent_id+'</span>'+ '<br>';
+          return '<span style="position: relative;top: -10px;padding: 0 5px;">设备类型：'+ params.data.name+'</span>'+ '<br>'
+                  + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">deep：'+ params.data.deep+'</span>'+ '<br>';
         }else{
-          return '<span style="position: relative;top: -10px;padding: 0 5px;">节点名：'+ params.data.name+'</span>'+ '<br>'
-                  + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">层数：'+ params.data.deep+'</span>'+ '<br>'
-                  + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">父节点：'+ params.data.parent_id+'</span>'+ '<br>';;
+          return '<span style="position: relative;top: -10px;padding: 0 5px;">设备类型：'+ params.data.name+'</span>'+ '<br>'
+                  + '<span style="padding-left:5px;height:30px;line-height:30px;display: inline-block;">deep：'+ params.data.deep+'</span>'+ '<br>';
         }
       }
       //去除默认的鼠标事件
